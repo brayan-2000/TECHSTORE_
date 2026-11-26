@@ -361,6 +361,7 @@ app.delete('/api/pedidos/:id', async (req,res)=>{
 
 const __dirname=path.dirname(fileURLToPath(import.meta.url))
 const dist=path.resolve(__dirname,'../dist')
+app.get('/admin/productos',(_req,res)=>res.sendFile(path.resolve(__dirname,'../api-resource-editor.html')))
 app.use(express.static(dist))
 app.get('*',(req,res)=>{
  if(req.path.startsWith('/api/')) return res.status(404).json({mensaje:'Ruta no encontrada'})
