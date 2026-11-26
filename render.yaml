@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: techstore-peru
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false

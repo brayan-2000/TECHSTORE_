@@ -1,0 +1,79 @@
+@host = http://localhost:3001
+
+### Descripción de la API
+GET {{host}}/api
+
+### Productos
+GET {{host}}/api/productos
+
+### Productos - buscar
+GET {{host}}/api/productos?buscar=laptop
+
+### Productos - destacados
+GET {{host}}/api/productos?destacados=true
+
+### Productos - ordenar por precio
+GET {{host}}/api/productos?ordenar=precio_asc
+
+### Producto por ID
+GET {{host}}/api/productos/1
+
+### Crear producto
+POST {{host}}/api/productos
+Content-Type: application/json
+
+{
+  "nombre": "Webcam HD",
+  "marca": "Vision",
+  "categoriaId": 4,
+  "precio": 159,
+  "anterior": null,
+  "stock": 20,
+  "destacado": false,
+  "descripcion": "Webcam para videollamadas y clases en línea.",
+  "especificaciones": ["Resolución HD", "Micrófono integrado"],
+  "imagen": "https://example.com/webcam.jpg"
+}
+
+### Actualizar producto (reemplaza todos sus campos editables)
+PUT {{host}}/api/productos/1
+Content-Type: application/json
+
+{
+  "nombre": "Laptop Pro 14 actualizada",
+  "marca": "TechPro",
+  "categoriaId": 1,
+  "precio": 3199,
+  "anterior": 3799,
+  "stock": 10,
+  "destacado": true,
+  "descripcion": "Rendimiento para estudiar, trabajar y crear.",
+  "especificaciones": ["Pantalla 14 pulgadas FHD", "16 GB RAM", "SSD 512 GB"],
+  "imagen": "https://example.com/laptop.jpg"
+}
+
+### Eliminar producto (ejemplo: elimina el producto con ID 9)
+DELETE {{host}}/api/productos/9
+
+### Categorías
+GET {{host}}/api/categorias
+
+### Promociones
+GET {{host}}/api/promociones
+
+### Clientes
+GET {{host}}/api/clientes
+
+### Pedidos
+GET {{host}}/api/pedidos
+
+### Crear pedido
+POST {{host}}/api/pedidos
+Content-Type: application/json
+
+{
+  "nombre": "Juan Perez",
+  "email": "juan@example.com",
+  "direccion": "Av. Lima 123",
+  "articulos": [{ "id": 1, "cantidad": 1 }]
+}

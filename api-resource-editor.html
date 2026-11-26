@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Editor de API | TechStore</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#f4f6f9;color:#1b2638;font:14px/1.5 "Segoe UI",sans-serif}.top{background:#172338;color:#fff;padding:30px 24px}.wrap{max-width:1180px;margin:auto}.eyebrow{margin:0 0 6px;color:#a9bdd9;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase}h1,h2,p{margin-top:0}h1{margin-bottom:5px;font-size:28px}.top p:last-child{margin:0;color:#c2ccda}.main{padding:24px}.notice{margin:0 0 16px;padding:12px 14px;border:1px solid #eadca8;border-radius:6px;background:#fff9e8;color:#6b5821;font-size:13px}.status{min-height:22px;margin:12px 0;color:#27724a;font-size:13px}.status.error{color:#a53930}.layout{display:grid;grid-template-columns:minmax(290px,360px) minmax(0,1fr);gap:20px;align-items:start}.panel{min-width:0;border:1px solid #e0e5ec;border-radius:7px;background:#fff}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid #e8ecf1}.panel-head h2{margin:0;font-size:17px}.form-body{display:grid;gap:13px;padding:18px 20px 20px}.form-body label{display:grid;gap:5px;color:#445166;font-size:12px;font-weight:700}.form-body input:not([type=checkbox]),.form-body select,.form-body textarea{width:100%;border:1px solid #ced6e1;border-radius:5px;padding:9px 10px;background:#fff;color:#1b2638;font:inherit}.form-body textarea{resize:vertical}.fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.featured{display:flex!important;align-items:center;gap:8px!important}.featured input{width:16px;height:16px;accent-color:#287c72}.actions{display:flex;gap:8px;margin-top:3px}.button{min-height:36px;border:1px solid #d5dce6;border-radius:5px;padding:7px 11px;background:#f5f7fa;color:#29364a;font:inherit;font-weight:700;text-decoration:none;cursor:pointer}.button:hover{background:#eaf0f6}.button.primary{border-color:#287c72;background:#287c72;color:#fff}.button.primary:hover{background:#21685f}.button.danger{border-color:#edd1cd;background:#fff8f6;color:#a33d32}.button:disabled{opacity:.55;cursor:wait}.count{min-width:26px;border-radius:20px;padding:2px 8px;background:#edf1f5;color:#536176;text-align:center;font-size:12px;font-weight:700}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;text-align:left}th,td{padding:12px 14px;border-bottom:1px solid #e9edf2;vertical-align:middle}th{background:#fafbfd;color:#69768a;font-size:11px;text-transform:uppercase;letter-spacing:.4px}td{font-size:13px}tbody tr:last-child td{border-bottom:0}.product{display:flex;align-items:center;gap:10px;min-width:180px}.product img{width:48px;height:42px;border-radius:4px;object-fit:cover;background:#eef1f5}.product span{display:grid;gap:2px}.product small{color:#738095;font-size:11px}.row-actions{display:flex;gap:6px}.row-actions .button{min-height:31px;padding:5px 8px;font-size:12px}.empty{padding:26px;color:#718096;text-align:center}.hint{margin:0;color:#718096;font-size:12px}
+    @media(max-width:850px){.layout{grid-template-columns:1fr}.form-body{grid-template-columns:repeat(2,minmax(0,1fr))}.form-body>label:nth-of-type(4),.form-body>label:nth-of-type(5),.form-body>label:nth-of-type(6),.form-body>.actions,.form-body>.hint{grid-column:1/-1}.fields{grid-column:1/-1}}
+    @media(max-width:560px){.top{padding:24px 18px}.main{padding:16px 12px}.layout{gap:14px}.form-body{grid-template-columns:1fr;padding:16px}.form-body>label,.form-body>label:nth-of-type(n){grid-column:auto}.fields{grid-template-columns:1fr 1fr}.form-body>.actions,.form-body>.hint{grid-column:1}.panel-head{padding:14px}.table-wrap{overflow:visible}table,tbody,tr,td{display:block;width:100%}thead{display:none}tbody{padding:4px 14px}tbody tr{padding:12px 0;border-bottom:1px solid #e9edf2}td{padding:4px 0;border:0}.row-actions{margin-top:6px}}
+  </style>
+</head>
+<body>
+  <header class="top"><div class="wrap"><p class="eyebrow">TechStore API · <span id="resource-label">Recursos</span></p><h1 id="page-title">Editor de API</h1><p>Administracion web de los datos del servidor</p></div></header>
+  <main class="wrap main">
+    <p class="notice">Demo sin autenticacion: cualquier persona que acceda a este servicio puede modificar datos. Los cambios se guardan en memoria y se pierden al reiniciar el servidor.</p>
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+    <div class="layout">
+      <section class="panel" aria-labelledby="form-title">
+        <div class="panel-head"><h2 id="form-title">Nuevo registro</h2><button class="button" id="new-record" type="button">Nuevo</button></div>
+        <form id="record-form" class="form-body"></form>
+      </section>
+      <section class="panel" aria-labelledby="list-title">
+        <div class="panel-head"><h2 id="list-title">Registros</h2><span class="count" id="count">0</span></div>
+        <div class="table-wrap"><table><thead id="columns"></thead><tbody id="records"><tr><td class="empty">Cargando...</td></tr></tbody></table></div>
+      </section>
+    </div>
+  </main>
+  <script>
+    const configs={
+      productos:{title:'Productos',singular:'Producto',columns:['Producto','Precio','Stock'],fields:[{name:'nombre',label:'Nombre',type:'text',required:true},{name:'marca',label:'Marca',type:'text',required:true},{name:'categoriaId',label:'Categoria',type:'category',required:true},{name:'precio',label:'Precio (S/)',type:'number',min:'0.01',step:'0.01',required:true},{name:'anterior',label:'Precio anterior',type:'number',min:'0.01',step:'0.01'},{name:'stock',label:'Stock',type:'number',min:'0',step:'1',required:true},{name:'descripcion',label:'Descripcion',type:'textarea',required:true},{name:'especificaciones',label:'Especificaciones (una por linea)',type:'lines',required:true},{name:'imagen',label:'URL de imagen',type:'url',required:true},{name:'destacado',label:'Producto destacado',type:'checkbox'}]},
+      categorias:{title:'Categorias',singular:'Categoria',columns:['Categoria','Slug','Icono'],fields:[{name:'nombre',label:'Nombre',type:'text',required:true},{name:'slug',label:'Slug (minusculas y guiones)',type:'text',required:true},{name:'icono',label:'Icono',type:'text',required:true}]},
+      promociones:{title:'Promociones',singular:'Promocion',columns:['Promocion','Codigo','Estado'],fields:[{name:'titulo',label:'Titulo',type:'text',required:true},{name:'descripcion',label:'Descripcion',type:'textarea',required:true},{name:'codigo',label:'Codigo',type:'text',required:true},{name:'activa',label:'Promocion activa',type:'checkbox'}]},
+      clientes:{title:'Clientes',singular:'Cliente',columns:['Cliente','ID'],fields:[{name:'nombre',label:'Nombre',type:'text',required:true},{name:'email',label:'Correo (dejar vacio al editar para conservar)',type:'email',required:true,optionalOnEdit:true}]},
+      pedidos:{title:'Pedidos',singular:'Pedido',columns:['Pedido','Fecha','Total','Estado'],create:false,fields:[{name:'estado',label:'Estado del pedido',type:'select',required:true,options:['Recibido (demostraci\u00f3n)','En preparaci\u00f3n','Enviado','Cancelado']}]}
+    }
+    const resource=location.pathname.split('/').filter(Boolean).pop()
+    const config=configs[resource]
+    const base=`/api/${resource}`
+    const form=document.querySelector('#record-form')
+    const records=document.querySelector('#records')
+    const status=document.querySelector('#status')
+    const categories=new Map()
+    let items=[]
+    let editingId=null
+    const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]))
+    function showStatus(message,error=false){status.textContent=message;status.classList.toggle('error',error)}
+    async function request(url,options={}){
+      const response=await fetch(url,{...options,headers:{Accept:'application/json',...(options.headers||{})}})
+      const data=await response.json().catch(()=>({mensaje:'Respuesta inesperada de la API.'}))
+      if(!response.ok)throw new Error(data.mensaje||`Error HTTP ${response.status}`)
+      return data
+    }
+    function displayState(value){return value?'Activa':'Inactiva'}
+    function renderCells(item){
+      if(resource==='productos')return `<td><div class="product"><img src="${escapeHtml(item.imagen)}" alt=""/><span><b>${escapeHtml(item.nombre)}</b><small>${escapeHtml(item.marca)} · ${escapeHtml(categories.get(item.categoriaId)||'')}</small></span></div></td><td>S/ ${Number(item.precio).toFixed(2)}</td><td>${item.stock}</td>`
+      if(resource==='categorias')return `<td>${escapeHtml(item.nombre)}</td><td>${escapeHtml(item.slug)}</td><td>${escapeHtml(item.icono)}</td>`
+      if(resource==='promociones')return `<td>${escapeHtml(item.titulo)}</td><td>${escapeHtml(item.codigo)}</td><td>${displayState(item.activa)}</td>`
+      if(resource==='clientes')return `<td>${escapeHtml(item.nombre)}</td><td>${item.id}</td>`
+      return `<td>#${item.id} (${item.articulos?.length||0} articulos)</td><td>${new Date(item.fecha).toLocaleString('es-PE')}</td><td>S/ ${Number(item.total).toFixed(2)}</td><td>${escapeHtml(item.estado)}</td>`
+    }
+    function renderRows(){
+      document.querySelector('#count').textContent=items.length
+      document.querySelector('#columns').innerHTML=`<tr>${config.columns.map(column=>`<th>${column}</th>`).join('')}<th>Acciones</th></tr>`
+      if(!items.length){records.innerHTML=`<tr><td colspan="${config.columns.length+1}" class="empty">No hay registros.</td></tr>`;return}
+      records.innerHTML=items.map(item=>`<tr>${renderCells(item)}<td><div class="row-actions"><button class="button" type="button" data-edit="${item.id}">Editar</button><button class="button danger" type="button" data-delete="${item.id}">Eliminar</button></div></td></tr>`).join('')
+    }
+    function fieldMarkup(field,item={}){
+      const value=field.type==='lines'?(item.especificaciones||[]).join('\n'):item[field.name]??''
+      const required=field.required&&!(editingId!==null&&field.optionalOnEdit)?'required':''
+      const id=`field-${field.name}`
+      let input=''
+      if(field.type==='textarea'||field.type==='lines')input=`<textarea id="${id}" name="${field.name}" rows="3" ${required}>${escapeHtml(value)}</textarea>`
+      else if(field.type==='checkbox')input=`<input id="${id}" name="${field.name}" type="checkbox" ${value?'checked':''}/>`
+      else if(field.type==='category')input=`<select id="${id}" name="${field.name}" ${required}>${Array.from(categories,([categoryId,name])=>`<option value="${categoryId}" ${Number(value)===categoryId?'selected':''}>${escapeHtml(name)}</option>`).join('')}</select>`
+      else if(field.type==='select')input=`<select id="${id}" name="${field.name}" ${required}>${field.options.map(option=>`<option value="${escapeHtml(option)}" ${value===option?'selected':''}>${escapeHtml(option)}</option>`).join('')}</select>`
+      else input=`<input id="${id}" name="${field.name}" type="${field.type}" value="${escapeHtml(value)}" ${field.min?`min="${field.min}"`:''} ${field.step?`step="${field.step}"`:''} ${required}/>`
+      return `<label class="${field.type==='checkbox'?'featured':''}" for="${id}">${field.label}${input}</label>`
+    }
+    function renderForm(item={}){
+      const creatingDisabled=config.create===false&&editingId===null
+      const fields=creatingDisabled?'':config.fields.map(field=>fieldMarkup(field,item)).join('')
+      const hint=creatingDisabled?'<p class="hint">Los pedidos se crean desde el checkout. Selecciona un pedido de la lista para cambiar su estado.</p>':resource==='clientes'&&editingId!==null?'<p class="hint">El correo no se muestra en la lista. Dejalo vacio para mantenerlo sin cambios.</p>':''
+      const actions=creatingDisabled?'':`<div class="actions"><button class="button primary" type="submit">${editingId!==null?'Guardar cambios':`Crear ${config.singular.toLowerCase()}`}</button><button class="button" type="button" id="cancel-edit" ${editingId===null?'hidden':''}>Cancelar</button></div>`
+      form.innerHTML=`${fields}${hint}${actions}`
+      document.querySelector('#form-title').textContent=editingId!==null?`Editar ${config.singular.toLowerCase()} #${editingId}`:`Nuevo ${config.singular.toLowerCase()}`
+      form.onsubmit=saveRecord
+    }
+    function resetForm(){editingId=null;renderForm()}
+    async function loadRecords(){items=await request(base);renderRows()}
+    async function saveRecord(event){
+      event.preventDefault()
+      const data=new FormData(form),payload={}
+      for(const field of config.fields){
+        const value=data.get(field.name)
+        if(field.type==='checkbox')payload[field.name]=data.has(field.name)
+        else if(field.type==='number'||field.type==='category')payload[field.name]=Number(value)
+        else if(field.type==='lines')payload.especificaciones=String(value).split('\n').map(line=>line.trim()).filter(Boolean)
+        else if(field.name==='email'&&editingId!==null&&!value)continue
+        else payload[field.name]=value
+      }
+      const submit=form.querySelector('[type="submit"]');submit.disabled=true
+      try{await request(editingId!==null?`${base}/${editingId}`:base,{method:editingId!==null?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const message=editingId!==null?`${config.singular} actualizado.`:`${config.singular} creado.`;resetForm();await loadRecords();showStatus(message)}
+      catch(error){showStatus(error.message,true)}finally{submit.disabled=false}
+    }
+    async function start(){
+      if(!config){showStatus('Recurso API desconocido.',true);return}
+      document.title=`Editor de ${config.title.toLowerCase()} | TechStore API`
+      document.querySelector('#resource-label').textContent=config.title
+      document.querySelector('#page-title').textContent=config.title
+      document.querySelector('#list-title').textContent=config.title
+      const newButton=document.querySelector('#new-record')
+      if(!config.create){newButton.hidden=true;document.querySelector('.panel-head').insertAdjacentHTML('beforeend','<a class="button" href="/checkout">Crear desde checkout</a>')}
+      newButton.addEventListener('click',resetForm)
+      try{
+        const categoryList=await request('/api/categorias')
+        categoryList.forEach(category=>categories.set(category.id,category.nombre))
+        renderForm();await loadRecords();showStatus('API conectada.')
+      }catch(error){showStatus(error.message,true);records.innerHTML=`<tr><td colspan="${config.columns.length+1}" class="empty">No se pudo cargar el recurso.</td></tr>`}
+    }
+    records.addEventListener('click',async event=>{
+      const edit=event.target.closest('[data-edit]')
+      if(edit){const item=items.find(record=>record.id===Number(edit.dataset.edit));if(!item)return;editingId=item.id;renderForm(item);form.scrollIntoView({behavior:'smooth',block:'start'});return}
+      const remove=event.target.closest('[data-delete]')
+      if(!remove||!window.confirm(`¿Eliminar este registro de ${config.title.toLowerCase()}?`))return
+      try{await request(`${base}/${remove.dataset.delete}`,{method:'DELETE'});if(editingId===Number(remove.dataset.delete))resetForm();await loadRecords();showStatus(`${config.singular} eliminado.`)}catch(error){showStatus(error.message,true)}
+    })
+    document.addEventListener('click',event=>{if(event.target.closest('#cancel-edit'))resetForm()})
+    start()
+  </script>
+</body>
+</html>
